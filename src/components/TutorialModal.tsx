@@ -8,10 +8,12 @@ import {
   Animated,
   Dimensions,
   Image,
+  StatusBar,
+  Text,
 } from 'react-native';
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons, Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 
-import { Text, Button } from './index';
 import { useTheme } from '../contexts/ThemeContext';
 import { Colors, Spacing, BorderRadius } from '../constants/theme';
 
@@ -62,32 +64,22 @@ const tutorials: Record<TutorialType, TutorialData> = {
     duration: '3 min',
     steps: [
       {
-        id: 'welcome',
-        title: 'Your Images Stay Private',
-        description: 'All image processing happens directly on your device. Your photos never leave your phone or get uploaded to any server.',
-        illustration: '🔒',
-        tips: ['No internet required for editing', 'Zero data collection', 'Complete offline functionality'],
+        id: 'privacy',
+        title: '100% Offline Privacy',
+        description: 'Your images never leave your device. No cloud, no tracking, just local power.',
+        illustration: 'shield-checkmark',
       },
       {
-        id: 'tools',
-        title: '9 Professional Tools',
-        description: 'Access crop, resize, compress, filters, watermark, text, converter, metadata, and background removal tools.',
-        illustration: '🛠️',
-        tips: ['One-tap quick actions', 'Batch processing support', 'Professional quality results'],
+        id: 'batch',
+        title: 'Professional Batch Tools',
+        description: 'Process 50+ images at once with ease. Resize, compress, and convert in seconds.',
+        illustration: 'folder-open',
       },
       {
-        id: 'navigation',
-        title: 'Easy Navigation',
-        description: 'Use the hamburger menu to access tools, history, and settings. Swipe gestures work throughout the app.',
-        illustration: '🧭',
-        tips: ['Pull-to-refresh in history', 'Swipe to dismiss modals', 'Long-press for quick actions'],
-      },
-      {
-        id: 'export',
-        title: 'Flexible Export Options',
-        description: 'Choose from JPEG, PNG, or WEBP formats with custom quality settings. Batch export multiple images at once.',
-        illustration: '📤',
-        tips: ['Multiple format support', 'Quality presets available', 'Batch processing with ZIP export'],
+        id: 'ownership',
+        title: 'You Own Your Data',
+        description: 'Owned by InteraMinds. Powerful tools for your professional workflow. Everything stays offline and secure.',
+        illustration: 'trophy',
       },
     ],
   },
@@ -359,157 +351,200 @@ const TutorialModal: React.FC<Props> = ({ visible, type, onClose, onComplete }) 
   };
   
   if (!tutorial) return null;
+
+  const getCurrentStepData = () => tutorial.steps[currentStep];
+  const currentStepData = getCurrentStepData();
+  const isDarkMode = currentStep < 2; // First 2 screens are dark
+  const bgColor = isDarkMode ? '#1c1c2e' : '#f8f8f8';
+  const textColor = isDarkMode ? '#ffffff' : '#1a1d2e';
+  const subtextColor = isDarkMode ? '#9ba3b4' : '#6b7280';
+
+  const renderIllustration = () => {
+    const step = currentStepData;
+    
+    if (step.id === 'privacy') {
+      // Screen 1: Shield with camera
+      return (
+        <View style={[styles.illustrationCard, { backgroundColor: '#2a2a45' }]}>
+          <View style={[styles.iconCircle, { backgroundColor: '#35354f' }]}>
+            <View style={styles.shieldContainer}>
+              <Ionicons name="shield" size={110} color="#5b5ff9" />
+              <View style={styles.cameraIconOverlay}>
+                <Ionicons name="camera" size={48} color="#ffffff" />
+              </View>
+            </View>
+          </View>
+        </View>
+      );
+    } else if (step.id === 'batch') {
+      // Screen 2: Folder with files
+      return (
+        <View style={[styles.illustrationCard, { backgroundColor: '#2a2a45' }]}>
+          <View style={[styles.iconCircle, { backgroundColor: '#35354f' }]}>
+            <Ionicons name="folder-open" size={100} color="#5b5ff9" />
+          </View>
+        </View>
+      );
+    } else if (step.id === 'ownership') {
+      // Screen 3: Trophy person illustration
+      // Note: Using simplified version - replace with actual illustration asset for 100% match
+      return (
+        <View style={[styles.illustrationCard, { backgroundColor: '#f5d5a0' }]}>
+          <View style={styles.trophyIllustration}>
+            {/* Person */}
+            <View style={styles.personContainer}>
+              <View style={styles.personHead} />
+              <View style={styles.personBody} />
+              <View style={styles.personArms} />
+            </View>
+            {/* Trophy on left */}
+            <View style={styles.trophyLeft}>
+              <Ionicons name="trophy" size={56} color="#d4a574" />
+            </View>
+            {/* Medal on right */}
+            <View style={styles.medalRight}>
+              <View style={styles.medalBadge}>
+                <Ionicons name="checkmark" size={32} color="#fff" />
+              </View>
+            </View>
+            {/* Decorative leaves */}
+            <View style={styles.leafLeft}>
+              <Ionicons name="leaf" size={44} color="#d4a574" />
+            </View>
+            <View style={styles.leafRight}>
+              <Ionicons name="leaf" size={38} color="#d4a574" />
+            </View>
+          </View>
+        </View>
+      );
+    }
+    return null;
+  };
+
+  const renderFloatingIcons = () => {
+    const step = currentStepData;
+    
+    if (step.id === 'privacy') {
+      return (
+        <>
+          <View style={[styles.floatingIcon, { top: '20%', right: '10%' }]}>
+            <View style={styles.floatingCircle}>
+              <Ionicons name="lock-closed" size={26} color="#5b5ff9" />
+            </View>
+          </View>
+          <View style={[styles.floatingIcon, { bottom: '48%', left: '8%' }]}>
+            <View style={styles.floatingCircle}>
+              <Ionicons name="eye-off" size={24} color="#5b5ff9" />
+            </View>
+          </View>
+        </>
+      );
+    } else if (step.id === 'batch') {
+      return (
+        <>
+          <View style={[styles.floatingIcon, { top: '18%', left: '10%' }]}>
+            <View style={styles.floatingCircle}>
+              <Ionicons name="color-wand" size={22} color="#5b5ff9" />
+            </View>
+          </View>
+          <View style={[styles.floatingIcon, { top: '16%', right: '12%' }]}>
+            <View style={styles.floatingCircle}>
+              <Ionicons name="images" size={26} color="#5b5ff9" />
+            </View>
+          </View>
+          <View style={[styles.floatingIcon, { bottom: '50%', left: '14%' }]}>
+            <View style={styles.floatingCircle}>
+              <Ionicons name="book" size={20} color="#5b5ff9" />
+            </View>
+          </View>
+        </>
+      );
+    }
+    return null;
+  };
   
   return (
     <Modal
       visible={visible}
-      animationType="slide"
+      animationType="fade"
       presentationStyle="fullScreen"
       onRequestClose={onClose}
     >
-      <View style={[styles.container, { backgroundColor: colors.background }]}>
-        {/* Header */}
-        <View style={[styles.header, { borderBottomColor: colors.border }]}>
-          <TouchableOpacity onPress={handleSkip} style={styles.skipButton}>
-            <Text variant="body" color="secondary">
-              Skip
-            </Text>
-          </TouchableOpacity>
-          
-          <View style={styles.headerCenter}>
-            <Text variant="h4" weight="semibold">
-              {tutorial.title}
-            </Text>
-            <Text variant="caption" color="secondary">
-              {tutorial.subtitle} • {tutorial.duration}
-            </Text>
+      <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} />
+      <View style={[styles.container, { backgroundColor: bgColor }]}>
+        {/* Skip Button */}
+        <TouchableOpacity onPress={handleSkip} style={styles.skipButton}>
+          <Text style={[styles.skipText, { color: isDarkMode ? '#9ba3b4' : '#5b5ff9' }]}>
+            Skip
+          </Text>
+        </TouchableOpacity>
+
+        {/* Floating Icons */}
+        {isDarkMode && renderFloatingIcons()}
+        
+        {/* Main Content */}
+        <View style={styles.contentWrapper}>
+          {/* Illustration */}
+          <View style={styles.illustrationWrapper}>
+            {renderIllustration()}
           </View>
           
-          <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-            <MaterialIcons name="close" size={24} color={colors.text.primary} />
-          </TouchableOpacity>
+          {/* Title */}
+          <Text style={[styles.title, { color: textColor }]}>
+            {currentStepData.title}
+          </Text>
+          
+          {/* Description */}
+          <Text style={[styles.description, { color: subtextColor }]}>
+            {currentStepData.description}
+          </Text>
         </View>
         
-        {/* Progress Bar */}
-        <View style={[styles.progressContainer, { backgroundColor: colors.border }]}>
-          <Animated.View
-            style={[
-              styles.progressBar,
-              {
-                backgroundColor: Colors.primary.main,
-                width: progressAnimation.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: ['0%', '100%'],
-                }),
-              },
-            ]}
-          />
-        </View>
-        
-        {/* Steps Container */}
-        <View style={styles.stepsContainer}>
-          <Animated.View
-            style={[
-              styles.stepsWrapper,
-              {
-                transform: [{ translateX: slideAnimation }],
-              },
-            ]}
-          >
-            {tutorial.steps.map((step, index) => (
-              <View key={step.id} style={styles.stepContainer}>
-                <ScrollView
-                  style={styles.stepContent}
-                  showsVerticalScrollIndicator={false}
-                  contentContainerStyle={styles.stepScrollContent}
-                >
-                  {/* Illustration */}
-                  <View style={styles.illustrationContainer}>
-                    <Text style={styles.illustration}>{step.illustration}</Text>
-                  </View>
-                  
-                  {/* Content */}
-                  <View style={styles.contentContainer}>
-                    <Text variant="h3" weight="bold" style={styles.stepTitle}>
-                      {step.title}
-                    </Text>
-                    
-                    <Text variant="body" color="secondary" style={styles.stepDescription}>
-                      {step.description}
-                    </Text>
-                    
-                    {/* Tips */}
-                    {step.tips && (
-                      <View style={styles.tipsContainer}>
-                        <Text variant="caption" weight="semibold" color="accent" style={styles.tipsTitle}>
-                          💡 Tips:
-                        </Text>
-                        {step.tips.map((tip, tipIndex) => (
-                          <View key={tipIndex} style={styles.tipItem}>
-                            <Text variant="caption" style={styles.tipBullet}>•</Text>
-                            <Text variant="caption" color="secondary" style={styles.tipText}>
-                              {tip}
-                            </Text>
-                          </View>
-                        ))}
-                      </View>
-                    )}
-                    
-                    {/* Action Highlight */}
-                    {step.action && (
-                      <View style={[styles.actionContainer, { borderColor: Colors.accent.main }]}>
-                        <MaterialIcons 
-                          name="touch-app" 
-                          size={20} 
-                          color={Colors.accent.main}
-                          style={styles.actionIcon}
-                        />
-                        <Text variant="body" color="accent" weight="medium">
-                          {step.action.text}
-                        </Text>
-                      </View>
-                    )}
-                  </View>
-                </ScrollView>
-              </View>
+        {/* Bottom Section */}
+        <View style={styles.bottomSection}>
+          {/* Progress Dots */}
+          <View style={styles.dotsContainer}>
+            {tutorial.steps.map((_, idx) => (
+              <View
+                key={idx}
+                style={[
+                  styles.dot,
+                  {
+                    backgroundColor: idx === currentStep
+                      ? '#6366f1'
+                      : isDarkMode ? '#4a4a6a' : '#d0d0d0',
+                    width: idx === currentStep ? 32 : 8,
+                  },
+                ]}
+              />
             ))}
-          </Animated.View>
-        </View>
-        
-        {/* Footer */}
-        <View style={[styles.footer, { borderTopColor: colors.border }]}>
-          <View style={styles.stepIndicator}>
-            <Text variant="caption" color="secondary">
-              {currentStep + 1} of {totalSteps}
-            </Text>
           </View>
           
-          <View style={styles.footerButtons}>
-            {currentStep > 0 && (
-              <Button
-                title="Previous"
-                onPress={handlePrevious}
-                variant="secondary"
-                style={styles.footerButton}
-              />
-            )}
-            
-            {isCompleted ? (
-              <Button
-                title="Get Started"
-                onPress={handleComplete}
-                variant="primary"
-                style={[styles.footerButton, { flex: 1 }]}
-              />
-            ) : (
-              <Button
-                title={currentStep === totalSteps - 1 ? "Finish" : "Next"}
-                onPress={handleNext}
-                variant="primary"
-                style={[styles.footerButton, { flex: 1 }]}
-              />
-            )}
-          </View>
+          {/* Next Button */}
+          <TouchableOpacity
+            style={styles.nextButton}
+            onPress={currentStep === tutorial.steps.length - 1 ? handleComplete : handleNext}
+          >
+            <LinearGradient
+              colors={['#5b5ff9', '#8b5cf6', '#a855f7']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.nextButtonGradient}
+            >
+              <Text style={styles.nextButtonText}>
+                {currentStep === tutorial.steps.length - 1 ? 'Get Started' : 'Next'}
+              </Text>
+              <Ionicons name="arrow-forward" size={20} color="#ffffff" style={{ marginLeft: 8 }} />
+            </LinearGradient>
+          </TouchableOpacity>
+          
+          {/* Privacy Badge - Only on Screen 2 */}
+          {currentStep === 1 && (
+            <View style={styles.privacyBadge}>
+              <Ionicons name="lock-closed" size={12} color="#8b8b9a" />
+              <Text style={styles.privacyText}>PRIVACY-FIRST PROCESSING</Text>
+            </View>
+          )}
         </View>
       </View>
     </Modal>
@@ -520,130 +555,205 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: Spacing.base,
-    paddingVertical: Spacing.md,
-    borderBottomWidth: 1,
-    justifyContent: 'space-between',
-  },
   skipButton: {
-    padding: Spacing.sm,
-    width: 60,
+    position: 'absolute',
+    top: 50,
+    right: 20,
+    zIndex: 100,
+    padding: 12,
   },
-  headerCenter: {
-    flex: 1,
-    alignItems: 'center',
+  skipText: {
+    fontSize: 17,
+    fontWeight: '500',
   },
-  closeButton: {
-    padding: Spacing.sm,
-    width: 60,
-    alignItems: 'flex-end',
+  floatingIcon: {
+    position: 'absolute',
+    zIndex: 1,
   },
-  progressContainer: {
-    height: 3,
-    marginHorizontal: Spacing.base,
-    borderRadius: 1.5,
-    overflow: 'hidden',
-  },
-  progressBar: {
-    height: '100%',
-    borderRadius: 1.5,
-  },
-  stepsContainer: {
-    flex: 1,
-    overflow: 'hidden',
-  },
-  stepsWrapper: {
-    flexDirection: 'row',
-    height: '100%',
-  },
-  stepContainer: {
-    width: SCREEN_WIDTH,
-    flex: 1,
-  },
-  stepContent: {
-    flex: 1,
-  },
-  stepScrollContent: {
-    flexGrow: 1,
-    paddingHorizontal: Spacing.base,
-    paddingVertical: Spacing.xl,
-  },
-  illustrationContainer: {
-    alignItems: 'center',
-    marginBottom: Spacing.xl,
-  },
-  illustration: {
-    fontSize: 80,
-  },
-  contentContainer: {
-    flex: 1,
-    justifyContent: 'center',
-  },
-  stepTitle: {
-    textAlign: 'center',
-    marginBottom: Spacing.md,
-  },
-  stepDescription: {
-    textAlign: 'center',
-    lineHeight: 24,
-    marginBottom: Spacing.xl,
-  },
-  tipsContainer: {
-    backgroundColor: 'rgba(99, 102, 241, 0.05)',
-    borderRadius: BorderRadius.md,
-    padding: Spacing.md,
-    marginBottom: Spacing.lg,
-  },
-  tipsTitle: {
-    marginBottom: Spacing.sm,
-  },
-  tipItem: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginBottom: Spacing.xs,
-  },
-  tipBullet: {
-    marginRight: Spacing.sm,
-    marginTop: 2,
-  },
-  tipText: {
-    flex: 1,
-    lineHeight: 18,
-  },
-  actionContainer: {
-    flexDirection: 'row',
+  floatingCircle: {
+    width: 68,
+    height: 68,
+    borderRadius: 34,
+    backgroundColor: 'rgba(42, 42, 69, 0.7)',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: Spacing.md,
-    borderRadius: BorderRadius.md,
-    borderWidth: 2,
-    borderStyle: 'dashed',
+    borderWidth: 1.5,
+    borderColor: 'rgba(91, 95, 249, 0.25)',
   },
-  actionIcon: {
-    marginRight: Spacing.sm,
+  contentWrapper: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+    paddingTop: 40,
   },
-  footer: {
+  illustrationWrapper: {
+    marginBottom: 50,
+  },
+  illustrationCard: {
+    width: SCREEN_WIDTH - 70,
+    height: SCREEN_WIDTH - 70,
+    borderRadius: 36,
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.12,
+    shadowRadius: 20,
+  },
+  iconCircle: {
+    width: 180,
+    height: 180,
+    borderRadius: 90,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  shieldContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative',
+    width: 100,
+    height: 100,
+  },
+  cameraIconOverlay: {
+    position: 'absolute',
+    top: 30,
+    left: 26,
+  },
+  trophyIllustration: {
+    width: '100%',
+    height: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative',
+  },
+  personContainer: {
+    alignItems: 'center',
+    zIndex: 2,
+  },
+  personHead: {
+    width: 70,
+    height: 70,
+    borderRadius: 35,
+    backgroundColor: '#2d3e50',
+    marginBottom: 2,
+  },
+  personBody: {
+    width: 85,
+    height: 95,
+    backgroundColor: '#f4f4f4',
+    borderRadius: 12,
+    position: 'relative',
+    zIndex: 1,
+  },
+  personArms: {
+    width: 140,
+    height: 12,
+    backgroundColor: '#f4f4f4',
+    borderRadius: 6,
+    position: 'absolute',
+    top: 85,
+  },
+  trophyLeft: {
+    position: 'absolute',
+    left: 30,
+    bottom: 75,
+    zIndex: 0,
+  },
+  medalRight: {
+    position: 'absolute',
+    right: 25,
+    top: 45,
+    zIndex: 0,
+  },
+  medalBadge: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: '#f9a825',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 3,
+    borderColor: '#fdd835',
+  },
+  leafLeft: {
+    position: 'absolute',
+    left: 45,
+    bottom: 120,
+    transform: [{ rotate: '-25deg' }],
+    opacity: 0.6,
+  },
+  leafRight: {
+    position: 'absolute',
+    right: 50,
+    bottom: 100,
+    transform: [{ rotate: '30deg' }],
+    opacity: 0.6,
+  },
+  title: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 14,
+    lineHeight: 40,
+    paddingHorizontal: 20,
+    letterSpacing: -0.5,
+  },
+  description: {
+    fontSize: 17,
+    textAlign: 'center',
+    lineHeight: 26,
+    paddingHorizontal: 32,
+    fontWeight: '400',
+  },
+  bottomSection: {
+    paddingBottom: 40,
+    paddingHorizontal: 24,
+    alignItems: 'center',
+  },
+  dotsContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: Spacing.base,
-    paddingVertical: Spacing.md,
-    borderTopWidth: 1,
-    justifyContent: 'space-between',
+    justifyContent: 'center',
+    marginBottom: 28,
+    gap: 8,
   },
-  stepIndicator: {
-    minWidth: 60,
+  dot: {
+    height: 8,
+    borderRadius: 4,
   },
-  footerButtons: {
+  nextButton: {
+    width: SCREEN_WIDTH - 80,
+    marginBottom: 20,
+  },
+  nextButtonGradient: {
     flexDirection: 'row',
-    flex: 1,
-    gap: Spacing.md,
-    marginLeft: Spacing.md,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 19,
+    borderRadius: 18,
+    elevation: 10,
+    shadowColor: '#5b5ff9',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.35,
+    shadowRadius: 14,
   },
-  footerButton: {
-    minWidth: 80,
+  nextButtonText: {
+    color: '#ffffff',
+    fontSize: 18,
+    fontWeight: '700',
+  },
+  privacyBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  privacyText: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: '#8b8b9a',
+    letterSpacing: 0.8,
   },
 });
 

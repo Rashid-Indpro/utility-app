@@ -7,13 +7,14 @@ import {
   TouchableOpacity,
   ScrollView,
   Alert,
+  Text,
 } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/native';
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons, Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 
-import { Text, Card, Button } from '../components';
+import { Card, Button } from '../components';
 import { useTheme } from '../contexts/ThemeContext';
 import { useImageTools } from '../hooks/useImageTools';
 import { Colors, Spacing } from '../constants/theme';
@@ -124,59 +125,43 @@ const ToolScreen: React.FC<Props> = ({ navigation, route }) => {
   };
   
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+    <SafeAreaView style={styles.container}>
       <StatusBar
-        barStyle="light-content"
-        backgroundColor={Colors.primary.start}
+        barStyle="dark-content"
+        backgroundColor="#ffffff"
         translucent={false}
       />
       
       {/* Header */}
-      <LinearGradient
-        colors={[Colors.primary.start, Colors.primary.end]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={styles.header}
-      >
+      <View style={styles.header}>
         <TouchableOpacity onPress={goBack} style={styles.backButton}>
-          <MaterialIcons name="arrow-back" size={24} color="#ffffff" />
+          <Ionicons name="chevron-back" size={28} color="#1a1d2e" />
         </TouchableOpacity>
         
-        <View style={styles.headerContent}>
-          <Text variant="h4" style={styles.headerTitle}>
-            {toolName}
-          </Text>
-        </View>
-        
-        <View style={styles.headerActions}>
-          <TouchableOpacity style={styles.actionButton}>
-            <MaterialIcons name="settings" size={24} color="#ffffff" />
-          </TouchableOpacity>
-        </View>
-      </LinearGradient>
-      
-      {/* Banner Ad Placeholder */}
-      <Card style={styles.bannerAd} glassmorphism={false}>
-        <Text variant="caption" color="tertiary" align="center">
-          Banner Ad Placeholder
+        <Text style={styles.headerTitle}>
+          {toolType === 'compress' ? 'Compressor Pro' : toolName}
         </Text>
-      </Card>
+        
+        <TouchableOpacity style={styles.settingsButton}>
+          <MaterialIcons name="settings" size={24} color="#5b5ff9" />
+        </TouchableOpacity>
+      </View>
       
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Image Selection */}
         {selectedImages.length === 0 ? (
-          <Card style={styles.imageSelectionCard} glassmorphism={true}>
+          <View style={styles.imageSelectionCard}>
             <View style={styles.imageSelection}>
               <MaterialIcons 
                 name="add-photo-alternate" 
                 size={48} 
-                color={Colors.primary.main} 
+                color="#5b5ff9"
                 style={styles.selectionIcon}
               />
-              <Text variant="h4" align="center" style={styles.selectionTitle}>
+              <Text style={styles.selectionTitle}>
                 Select Images
               </Text>
-              <Text variant="body" color="secondary" align="center" style={styles.selectionMessage}>
+              <Text style={styles.selectionMessage}>
                 Choose one or more images to get started
               </Text>
               
@@ -195,7 +180,7 @@ const ToolScreen: React.FC<Props> = ({ navigation, route }) => {
                 />
               </View>
             </View>
-          </Card>
+          </View>
         ) : (
           <View style={styles.selectedImagesHeader}>
             <Text variant="body" weight="medium">

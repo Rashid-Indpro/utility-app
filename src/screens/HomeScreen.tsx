@@ -6,14 +6,14 @@ import {
   TouchableOpacity,
   SafeAreaView,
   StatusBar,
+  Text,
 } from 'react-native';
 import { DrawerActions } from '@react-navigation/drawer';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons, Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 
 import { 
-  Text, 
   Card, 
   Button, 
   GlobalSettingsModal, 
@@ -35,6 +35,7 @@ interface QuickAction {
   id: string;
   title: string;
   icon: keyof typeof MaterialIcons.glyphMap;
+  iconColor: string;
   action: () => void;
 }
 
@@ -69,31 +70,28 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
     }
   }, [settings.showTutorials]);
   
-  // Quick Actions as per requirements
+  // Quick Actions as per requirements - update icons to match design
   const quickActions: QuickAction[] = [
     {
       id: 'compress500',
-      title: 'Compress to 500KB',
+      title: 'Compress to\n500KB',
       icon: 'compress',
+      iconColor: '#5b5ff9',
       action: () => navigation.navigate('Tool', { toolName: 'Compress to 500KB', toolType: 'compress' }),
     },
     {
       id: 'instagram',
-      title: 'Instagram Post Size',
-      icon: 'crop',
-      action: () => navigation.navigate('Tool', { toolName: 'Instagram Post Size', toolType: 'crop' }),
+      title: 'Instagram\nSize',
+      icon: 'crop-square',
+      iconColor: '#ec4899',
+      action: () => navigation.navigate('Tool', { toolName: 'Instagram Size', toolType: 'crop' }),
     },
     {
       id: 'resize1080',
-      title: 'Resize to 1080p',
+      title: 'Resize\n1080p',
       icon: 'photo-size-select-large',
-      action: () => navigation.navigate('Tool', { toolName: 'Resize to 1080p', toolType: 'resize' }),
-    },
-    {
-      id: 'metadata',
-      title: 'Remove Metadata',
-      icon: 'cleaning-services',
-      action: () => navigation.navigate('Tool', { toolName: 'Remove Metadata', toolType: 'metadata' }),
+      iconColor: '#8b5cf6',
+      action: () => navigation.navigate('Tool', { toolName: 'Resize 1080p', toolType: 'resize' }),
     },
   ];
   
@@ -201,145 +199,122 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
   };
   
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+    <SafeAreaView style={styles.container}>
       <StatusBar
-        barStyle="light-content"
-        backgroundColor={Colors.primary.start}
+        barStyle="dark-content"
+        backgroundColor="#f8f8f8"
         translucent={false}
       />
       
       {/* Header */}
-      <LinearGradient
-        colors={[Colors.primary.start, Colors.primary.end]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={styles.header}
-      >
-        <TouchableOpacity onPress={openDrawer} style={styles.headerButton}>
-          <MaterialIcons name="menu" size={24} color="#ffffff" />
+      <View style={styles.header}>
+        <TouchableOpacity onPress={openDrawer} style={styles.menuButton}>
+          <View style={styles.menuIconCircle}>
+            <MaterialIcons name="menu" size={24} color="#5b5ff9" />
+          </View>
         </TouchableOpacity>
         
-        <View style={styles.headerContent}>
-          <Text variant="h2" style={styles.appName}>
-            Pixozen
-          </Text>
-          <Text variant="caption" style={styles.tagline}>
-            Powerful Image Tools. Zero Cloud.
-          </Text>
-          <Text variant="caption" style={styles.ownership}>
-            Owned by InteraMinds
-          </Text>
-        </View>
+        <Text style={styles.appName}>PIXOZEN</Text>
         
-        <TouchableOpacity onPress={navigateToHistory} style={styles.headerButton}>
-          <MaterialIcons name="history" size={24} color="#ffffff" />
+        <TouchableOpacity onPress={openSettings} style={styles.userButton}>
+          <View style={styles.userIconCircle}>
+            <MaterialIcons name="person" size={24} color="#ffffff" />
+          </View>
         </TouchableOpacity>
-        
-        <TouchableOpacity onPress={openSettings} style={styles.headerButton}>
-          <MaterialIcons name="settings" size={24} color="#ffffff" />
-        </TouchableOpacity>
-      </LinearGradient>
+      </View>
       
       <ScrollView 
         style={styles.content}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        {/* Top Banner Ad Placeholder */}
-        <Card style={styles.bannerAd} glassmorphism={false}>
-          <Text variant="caption" color="tertiary" align="center">
-            Banner Ad Placeholder
-          </Text>
-        </Card>
-        
-        {/* Privacy Promise */}
-        <Card style={styles.privacyCard} glassmorphism={true}>
-          <View style={styles.privacyContent}>
-            <MaterialIcons 
-              name="security" 
-              size={24} 
-              color={Colors.accent.main} 
-              style={styles.privacyIcon}
-            />
-            <Text variant="body" weight="medium" style={styles.privacyText}>
-              Your images never leave your device.
-            </Text>
+        {/* Hero Section */}
+        <View style={styles.heroSection}>
+          <View style={styles.heroIconContainer}>
+            <View style={styles.heroIconGlow}>
+              <View style={styles.heroIconCircle}>
+                <Ionicons name="image-outline" size={42} color="#5b5ff9" />
+                <View style={styles.magnifyIcon}>
+                  <Ionicons name="search" size={20} color="#5b5ff9" />
+                </View>
+              </View>
+            </View>
           </View>
-        </Card>
-        
-        {/* Quick Actions Bar */}
-        <View style={styles.sectionContainer}>
-          <Text variant="h4" weight="semibold" style={styles.sectionTitle}>
-            Quick Actions
+          
+          <Text style={styles.heroTitle}>
+            Powerful Image Tools.{'\n'}
+            <Text style={styles.heroTitleBlue}>Zero Cloud.</Text>
           </Text>
+          
+          <Text style={styles.ownership}>Owned by InteraMinds</Text>
+        </View>
+        
+        {/* PRO Feature Card */}
+        <View style={styles.proCard}>
+          <Text style={styles.proLabel}>PRO FEATURE</Text>
+          <Text style={styles.proTitle}>Batch Process Images Offline</Text>
+          <TouchableOpacity style={styles.upgradeButton}>
+            <LinearGradient
+              colors={['#5b5ff9', '#8b5cf6']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.upgradeGradient}
+            >
+              <Text style={styles.upgradeText}>Upgrade Now</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+        </View>
+        
+        {/* Quick Action Bar */}
+        <View style={styles.section}>
+          <Text style={styles.sectionHeader}>QUICK ACTION BAR</Text>
           <ScrollView 
             horizontal 
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.quickActionsContainer}
+            contentContainerStyle={styles.quickActionsScroll}
           >
             {quickActions.map((action) => (
               <TouchableOpacity
                 key={action.id}
-                style={styles.quickActionButton}
+                style={styles.quickActionCard}
                 onPress={action.action}
                 activeOpacity={0.7}
               >
-                <Card style={styles.quickActionCard} glassmorphism={true}>
+                <View style={styles.quickActionIconCircle}>
                   <MaterialIcons 
                     name={action.icon} 
-                    size={24} 
-                    color={Colors.primary.main} 
+                    size={28} 
+                    color={action.iconColor} 
                   />
-                  <Text variant="caption" align="center" style={styles.quickActionText}>
-                    {action.title}
-                  </Text>
-                </Card>
+                </View>
+                <Text style={styles.quickActionText}>{action.title}</Text>
               </TouchableOpacity>
             ))}
           </ScrollView>
         </View>
         
         {/* Main Tool Grid */}
-        <View style={styles.sectionContainer}>
-          <Text variant="h4" weight="semibold" style={styles.sectionTitle}>
-            Image Tools
-          </Text>
+        <View style={styles.section}>
+          <Text style={styles.sectionHeader}>MAIN TOOL GRID</Text>
           <View style={styles.toolGrid}>
             {tools.map((tool) => (
               <TouchableOpacity
                 key={tool.id}
-                style={styles.toolButton}
+                style={styles.toolCard}
                 onPress={() => handleToolPress(tool)}
                 activeOpacity={0.7}
               >
-                <Card style={styles.toolCard} glassmorphism={true}>
-                  <View style={styles.toolIcon}>
-                    <MaterialIcons 
-                      name={tool.icon} 
-                      size={32} 
-                      color={Colors.primary.main} 
-                    />
-                  </View>
-                  <Text variant="body" weight="medium" align="center">
-                    {tool.name}
-                  </Text>
-                  <Text variant="caption" color="secondary" align="center" style={styles.toolDescription}>
-                    {tool.description}
-                  </Text>
-                </Card>
+                <View style={styles.toolIconCircle}>
+                  <MaterialIcons 
+                    name={tool.icon} 
+                    size={28} 
+                    color="#5b5ff9" 
+                  />
+                </View>
+                <Text style={styles.toolName}>{tool.name}</Text>
               </TouchableOpacity>
             ))}
           </View>
-        </View>
-        
-        {/* Footer */}
-        <View style={styles.footer}>
-          <Text variant="caption" color="tertiary" align="center">
-            Made with ❤️
-          </Text>
-          <Text variant="caption" color="tertiary" align="center">
-            Made in 🇮🇳 India
-          </Text>
         </View>
       </ScrollView>
       
@@ -355,7 +330,6 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
         onClose={() => setShowTutorial(false)}
         onComplete={() => {
           setShowTutorial(false);
-          // Navigate to tool if tutorial was for a specific tool
           if (tutorialType !== 'app-introduction') {
             const toolType = tutorialType.replace('-tool', '') as Tool['type'];
             const tool = tools.find(t => t.type === toolType);
@@ -370,7 +344,6 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
         visible={showHistory}
         onClose={() => setShowHistory(false)}
         onReEdit={(item) => {
-          // Navigate to the appropriate tool with the history item
           const tool = tools.find(t => t.type === item.operation as Tool['type']);
           if (tool) {
             navigation.navigate('Tool', {
@@ -388,120 +361,225 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#f8f8f8',
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: Spacing.base,
-    paddingVertical: Spacing.md,
-    elevation: 4,
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    backgroundColor: '#ffffff',
+    elevation: 2,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 3,
   },
   menuButton: {
-    padding: Spacing.sm,
+    width: 44,
+    height: 44,
   },
-  headerButton: {
-    padding: Spacing.sm,
-    marginHorizontal: Spacing.xs,
-  },
-  headerContent: {
-    flex: 1,
+  menuIconCircle: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#e8e8f5',
     alignItems: 'center',
+    justifyContent: 'center',
   },
   appName: {
-    color: '#ffffff',
+    fontSize: 20,
     fontWeight: '700',
+    color: '#1a1d2e',
+    letterSpacing: 0.5,
   },
-  tagline: {
-    color: 'rgba(255, 255, 255, 0.8)',
-    marginTop: 2,
+  userButton: {
+    width: 44,
+    height: 44,
   },
-  ownership: {
-    color: 'rgba(255, 255, 255, 0.7)',
-    fontSize: 12,
+  userIconCircle: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#5b5ff9',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   content: {
     flex: 1,
   },
   scrollContent: {
-    paddingBottom: Spacing.xl,
+    paddingBottom: 30,
   },
-  bannerAd: {
-    height: 80,
-    marginHorizontal: Spacing.base,
-    marginTop: Spacing.base,
-    justifyContent: 'center',
-    backgroundColor: Colors.light.borderLight,
-  },
-  privacyCard: {
-    marginHorizontal: Spacing.base,
-    marginTop: Spacing.base,
-  },
-  privacyContent: {
-    flexDirection: 'row',
+  heroSection: {
     alignItems: 'center',
+    paddingVertical: 40,
+    paddingHorizontal: 20,
   },
-  privacyIcon: {
-    marginRight: Spacing.sm,
+  heroIconContainer: {
+    marginBottom: 30,
   },
-  privacyText: {
-    flex: 1,
+  heroIconGlow: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(91, 95, 249, 0.08)',
+    shadowColor: '#5b5ff9',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 6,
   },
-  sectionContainer: {
-    marginTop: Spacing.xl,
+  heroIconCircle: {
+    width: 96,
+    height: 96,
+    borderRadius: 48,
+    backgroundColor: '#ffffff',
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative',
   },
-  sectionTitle: {
-    marginHorizontal: Spacing.base,
-    marginBottom: Spacing.md,
+  magnifyIcon: {
+    position: 'absolute',
+    bottom: 8,
+    right: 8,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: '#ffffff',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  quickActionsContainer: {
-    paddingLeft: Spacing.base,
-    paddingRight: Spacing.sm,
+  heroTitle: {
+    fontSize: 26,
+    fontWeight: '700',
+    color: '#1a1d2e',
+    textAlign: 'center',
+    lineHeight: 36,
+    marginBottom: 8,
   },
-  quickActionButton: {
-    marginRight: Spacing.sm,
+  heroTitleBlue: {
+    color: '#5b5ff9',
+  },
+  ownership: {
+    fontSize: 14,
+    color: '#8991a0',
+    fontWeight: '400',
+  },
+  proCard: {
+    backgroundColor: '#f0f0ff',
+    marginHorizontal: 20,
+    borderRadius: 20,
+    padding: 24,
+    marginBottom: 30,
+  },
+  proLabel: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#7c7ff9',
+    letterSpacing: 1,
+    marginBottom: 8,
+  },
+  proTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#1a1d2e',
+    marginBottom: 16,
+  },
+  upgradeButton: {
+    alignSelf: 'flex-start',
+  },
+  upgradeGradient: {
+    paddingHorizontal: 28,
+    paddingVertical: 12,
+    borderRadius: 16,
+  },
+  upgradeText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#ffffff',
+  },
+  section: {
+    marginBottom: 30,
+  },
+  sectionHeader: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#a0a8b8',
+    letterSpacing: 1,
+    marginBottom: 16,
+    paddingHorizontal: 20,
+  },
+  quickActionsScroll: {
+    paddingLeft: 20,
+    paddingRight: 10,
   },
   quickActionCard: {
-    width: 100,
-    height: 80,
-    justifyContent: 'center',
+    backgroundColor: '#ffffff',
+    borderRadius: 20,
+    padding: 20,
+    marginRight: 12,
+    width: 140,
     alignItems: 'center',
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+  },
+  quickActionIconCircle: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: '#f5f5ff',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 12,
   },
   quickActionText: {
-    marginTop: Spacing.xs,
-    lineHeight: 14,
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#2d3142',
+    textAlign: 'center',
+    lineHeight: 18,
   },
   toolGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    paddingHorizontal: Spacing.base,
-    justifyContent: 'space-between',
-  },
-  toolButton: {
-    width: '48%',
-    marginBottom: Spacing.md,
+    paddingHorizontal: 20,
+    gap: 12,
   },
   toolCard: {
-    minHeight: 120,
-    justifyContent: 'center',
+    backgroundColor: '#ffffff',
+    borderRadius: 20,
+    padding: 18,
+    width: '30.5%',
     alignItems: 'center',
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    minHeight: 105,
+    justifyContent: 'center',
   },
-  toolIcon: {
-    marginBottom: Spacing.sm,
-    padding: Spacing.sm,
-    borderRadius: BorderRadius.full,
-    backgroundColor: 'rgba(79, 70, 229, 0.1)',
+  toolIconCircle: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#f5f5ff',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 8,
   },
-  toolDescription: {
-    marginTop: Spacing.xs,
-  },
-  footer: {
-    marginTop: Spacing['3xl'],
-    paddingHorizontal: Spacing.base,
-    paddingVertical: Spacing.xl,
+  toolName: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#2d3142',
+    textAlign: 'center',
   },
 });
 
