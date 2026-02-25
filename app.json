@@ -1,0 +1,38 @@
+{
+  "expo": {
+    "name": "Pixozen",
+    "slug": "pixozen",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSPhotoLibraryUsageDescription": "This app needs access to your photos to edit and enhance them.",
+        "NSCameraUsageDescription": "This app needs access to your camera to take photos for editing."
+      }
+    },
+    "android": {
+      "permissions": [
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
+      ]
+    },
+
+    "plugins": [
+      "expo-image-picker",
+      "expo-media-library",
+      "expo-document-picker"
+    ],
+    "experiments": {
+      "turboModules": false,
+      "typedRoutes": false,
+      "newArchEnabled": false
+    },
+    "jsEngine": "hermes"
+  }
+}
