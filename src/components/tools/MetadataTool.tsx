@@ -2,7 +2,8 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 
-import { Text, Card } from '../index';
+import { Text } from '../Text';
+import { Card } from '../Card';
 import { Colors, Spacing } from '../../constants/theme';
 import type { ToolProps } from './types';
 

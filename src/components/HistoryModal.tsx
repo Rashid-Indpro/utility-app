@@ -15,8 +15,11 @@ import {
 import { MaterialIcons } from '@expo/vector-icons';
 import * as Sharing from 'expo-sharing';
 import * as FileSystem from 'expo-file-system';
+import { getInfoAsync } from 'expo-file-system/legacy';
 
-import { Text, Card, Button } from './index';
+import { Text } from './Text';
+import { Card } from './Card';
+import { Button } from './Button';
 import { useTheme } from '../contexts/ThemeContext';
 import { useHistory } from '../hooks/useStorage';
 import { Colors, Spacing, BorderRadius } from '../constants/theme';
@@ -132,7 +135,7 @@ const HistoryModal: React.FC<Props> = ({ visible, onClose, onReEdit }) => {
   
   const handleShareItem = async (item: HistoryItem) => {
     try {
-      const fileExists = await FileSystem.getInfoAsync(item.outputPath);
+      const fileExists = await getInfoAsync(item.outputPath);
       if (!fileExists.exists) {
         Alert.alert('Error', 'The processed image file could not be found.');
         return;

@@ -88,9 +88,9 @@ const HistoryScreen: React.FC<Props> = ({ navigation }) => {
   // Filter history based on active tab
   const filteredHistory = history.filter(item => {
     if (activeTab === 'all') return true;
-    if (activeTab === 'compressed') return item.operation === 'compress';
-    if (activeTab === 'upscaled') return item.operation === 'resize';
-    if (activeTab === 'converted') return item.operation === 'converter';
+    if (activeTab === 'compressed') return item.toolUsed === 'compress';
+    if (activeTab === 'upscaled') return item.toolUsed === 'resize';
+    if (activeTab === 'converted') return item.toolUsed === 'converter';
     return true;
   });
   
@@ -196,7 +196,7 @@ const HistoryScreen: React.FC<Props> = ({ navigation }) => {
             contentContainerStyle={styles.historyList}
           >
             {filteredHistory.map((item) => {
-              const badge = getOperationBadge(item.operation);
+              const badge = getOperationBadge(item.toolUsed);
               return (
                 <View key={item.id} style={styles.historyItem}>
                   <View style={styles.thumbnailContainer}>
@@ -221,7 +221,7 @@ const HistoryScreen: React.FC<Props> = ({ navigation }) => {
                     </View>
                     
                     <Text style={styles.fileName} numberOfLines={1}>
-                      {item.fileName || `${item.operation}_image_01.${item.format}`}
+                      {item.originalImage.name || `${item.toolUsed}_image_01.${item.format}`}
                     </Text>
                     
                     <View style={styles.metaRow}>
@@ -230,7 +230,7 @@ const HistoryScreen: React.FC<Props> = ({ navigation }) => {
                       </Text>
                       <Text style={styles.metaText}> • </Text>
                       <Text style={styles.metaText}>
-                        {formatFileSize(item.fileSize || 2400000)}
+                        {formatFileSize(item.processedImage.size || 2400000)}
                       </Text>
                     </View>
                     

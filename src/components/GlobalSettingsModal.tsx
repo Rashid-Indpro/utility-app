@@ -10,7 +10,9 @@ import {
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 
-import { Text, Card, Button } from './index';
+import { Text } from './Text';
+import { Card } from './Card';
+import { Button } from './Button';
 import { useTheme } from '../contexts/ThemeContext';
 import { useSettings } from '../hooks/useStorage';
 import { Colors, Spacing, BorderRadius } from '../constants/theme';

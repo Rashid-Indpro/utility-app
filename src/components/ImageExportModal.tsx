@@ -12,7 +12,9 @@ import {
 import { MaterialIcons } from '@expo/vector-icons';
 import Slider from '@react-native-community/slider';
 
-import { Text, Card, Button } from './index';
+import { Text } from './Text';
+import { Card } from './Card';
+import { Button } from './Button';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useImageSaver } from '@/hooks/useImageTools';
 import { formatFileSize, generateFileName } from '@/utils/fileManager';

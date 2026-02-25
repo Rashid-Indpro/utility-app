@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import * as FileSystem from 'expo-file-system';
+import { getInfoAsync } from 'expo-file-system/legacy';
 
 // Conditionally import native modules for mobile platforms
 let zip: any = null;
@@ -26,7 +27,9 @@ if (Platform.OS !== 'web') {
   }
 }
 
-import { Text, Card, Button } from './index';
+import { Text } from './Text';
+import { Card } from './Card';
+import { Button } from './Button';
 import { useTheme } from '../contexts/ThemeContext';
 import { useImageProcessing } from '../contexts/ImageProcessingContext';
 import { useHistory } from '../hooks/useStorage';
@@ -139,7 +142,7 @@ const BatchProcessor: React.FC<Props> = ({
           );
           
           // Get file info
-          const fileInfo = await FileSystem.getInfoAsync(savedPath);
+          const fileInfo = await getInfoAsync(savedPath);
           
           const processedItem: BatchProcessingItem = {
             ...item,

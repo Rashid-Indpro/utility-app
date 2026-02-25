@@ -1,5 +1,5 @@
 import * as ImageManipulator from 'expo-image-manipulator';
-import * as FileSystem from 'expo-file-system';
+import { getInfoAsync } from 'expo-file-system/legacy';
 
 export interface ImageInfo {
   uri: string;
@@ -42,7 +42,16 @@ export interface ProcessedResult {
  */
 export const getImageInfo = async (uri: string): Promise<ImageInfo> => {
   try {
-    const fileInfo = await FileSystem.getInfoAsync(uri);
+    let fileSize: number | undefined;
+    
+    try {
+      const fileInfo = await getInfoAsync(uri);
+      if (fileInfo.exists && 'size' in fileInfo) {
+        fileSize = fileInfo.size;
+      }
+    } catch (e) {
+      console.warn('Could not get file size:', e);
+    }
     
     // Get image dimensions using ImageManipulator
     const manipulatorResult = await ImageManipulator.manipulateAsync(
@@ -58,7 +67,7 @@ export const getImageInfo = async (uri: string): Promise<ImageInfo> => {
       uri,
       width: manipulatorResult.width,
       height: manipulatorResult.height,
-      size: fileInfo.exists ? fileInfo.size : undefined,
+      size: fileSize,
       format: fileExtension,
       name: fileName,
     };
@@ -138,8 +147,16 @@ export const compressToTargetSize = async (
     );
     
     lastResult = result;
-    const fileInfo = await FileSystem.getInfoAsync(result.uri);
-    const currentSizeKB = (fileInfo.size || 0) / 1024;
+    let currentSizeKB = 0;
+    try {
+      const fileInfo = await getInfoAsync(result.uri);
+      if (fileInfo.exists && 'size' in fileInfo) {
+        currentSizeKB = (fileInfo.size || 0) / 1024;
+      }
+    } catch (e) {
+      console.warn('Could not get file size:', e);
+      break; // Exit loop if we can't get size
+    }
     
     if (currentSizeKB <= targetSizeKB || currentQuality <= 0.1) {
       return {
@@ -147,7 +164,7 @@ export const compressToTargetSize = async (
         width: result.width,
         height: result.height,
         originalSize: originalInfo.size,
-        processedSize: fileInfo.size || 0,
+        processedSize: currentSizeKB * 1024,
         compressionRatio: originalSizeKB / currentSizeKB,
       };
     }
@@ -159,13 +176,23 @@ export const compressToTargetSize = async (
     iterations++;
   }
   
+  let finalSize = 0;
+  try {
+    const fileInfo = await getInfoAsync(lastResult!.uri);
+    if (fileInfo.exists && 'size' in fileInfo) {
+      finalSize = fileInfo.size || 0;
+    }
+  } catch (e) {
+    console.warn('Could not get final file size:', e);
+  }
+  
   return {
     uri: lastResult!.uri,
     width: lastResult!.width,
     height: lastResult!.height,
     originalSize: originalInfo.size,
-    processedSize: (await FileSystem.getInfoAsync(lastResult!.uri)).size || 0,
-    compressionRatio: originalSizeKB / ((await FileSystem.getInfoAsync(lastResult!.uri)).size || 1) * 1024,
+    processedSize: finalSize,
+    compressionRatio: originalSizeKB / (finalSize / 1024 || 1),
   };
 };
 
@@ -211,10 +238,11 @@ export const processImage = async (
     
     // Add flip action
     if (options.flip) {
-      const flipAction = options.flip === 'horizontal' 
-        ? { flip: ImageManipulator.FlipType.Horizontal }
-        : { flip: ImageManipulator.FlipType.Vertical };
-      actions.push(flipAction);
+      actions.push({
+        flip: options.flip === 'horizontal' 
+          ? ImageManipulator.FlipType.Horizontal 
+          : ImageManipulator.FlipType.Vertical
+      });
     }
     
     // Process the image
@@ -227,15 +255,23 @@ export const processImage = async (
       }
     );
     
-    const processedInfo = await FileSystem.getInfoAsync(result.uri);
+    let processedSize = 0;
+    try {
+      const processedInfo = await getInfoAsync(result.uri);
+      if (processedInfo.exists && 'size' in processedInfo) {
+        processedSize = processedInfo.size || 0;
+      }
+    } catch (e) {
+      console.warn('Could not get processed file size:', e);
+    }
     
     return {
       uri: result.uri,
       width: result.width,
       height: result.height,
       originalSize: originalInfo.size,
-      processedSize: processedInfo.size || 0,
-      compressionRatio: originalInfo.size ? (originalInfo.size / (processedInfo.size || 1)) : 1,
+      processedSize,
+      compressionRatio: originalInfo.size ? (originalInfo.size / (processedSize || 1)) : 1,
     };
   } catch (error) {
     throw new Error(`Image processing failed: ${error}`);

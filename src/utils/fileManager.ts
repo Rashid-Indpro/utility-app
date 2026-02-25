@@ -2,6 +2,7 @@ import * as ImagePicker from 'expo-image-picker';
 import * as DocumentPicker from 'expo-document-picker';
 import * as MediaLibrary from 'expo-media-library';
 import * as FileSystem from 'expo-file-system';
+import { getInfoAsync } from 'expo-file-system/legacy';
 import * as Sharing from 'expo-sharing';
 import { Platform } from 'react-native';
 
@@ -37,11 +38,8 @@ export interface SaveOptions {
  */
 export const requestPermissions = async (): Promise<boolean> => {
   try {
-    // Request media library permissions
-    const mediaLibraryPermission = await MediaLibrary.requestPermissionsAsync();
-    if (mediaLibraryPermission.status !== 'granted') {
-      return false;
-    }
+    // Note: In Expo Go, MediaLibrary.requestPermissionsAsync causes AUDIO permission errors
+    // Instead, we let individual operations (ImagePicker, createAssetAsync) handle their own permissions
     
     // Request camera permissions (for camera access)
     const cameraPermission = await ImagePicker.requestCameraPermissionsAsync();
@@ -50,10 +48,18 @@ export const requestPermissions = async (): Promise<boolean> => {
       // Don't return false as we can still use gallery
     }
     
+    // Request image picker permissions
+    const mediaPermission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (mediaPermission.status !== 'granted') {
+      console.warn('Media library permission not granted');
+      // Continue anyway - some operations might still work
+    }
+    
     return true;
   } catch (error) {
     console.error('Error requesting permissions:', error);
-    return false;
+    // Return true to allow the app to continue
+    return true;
   }
 };
 
@@ -63,7 +69,7 @@ export const requestPermissions = async (): Promise<boolean> => {
 export const pickSingleImage = async (): Promise<PickedImage | null> => {
   try {
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ['images'],
       allowsEditing: false,
       quality: 1,
       allowsMultipleSelection: false,
@@ -92,7 +98,7 @@ export const pickSingleImage = async (): Promise<PickedImage | null> => {
 export const pickMultipleImages = async (): Promise<PickedImage[]> => {
   try {
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ['images'],
       allowsEditing: false,
       quality: 1,
       allowsMultipleSelection: true,
@@ -121,7 +127,7 @@ export const pickMultipleImages = async (): Promise<PickedImage[]> => {
 export const takePhoto = async (): Promise<PickedImage | null> => {
   try {
     const result = await ImagePicker.launchCameraAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ['images'],
       allowsEditing: false,
       quality: 1,
     });
@@ -290,7 +296,7 @@ export const cleanupTempFiles = async (): Promise<void> => {
     
     for (const tempFile of tempFiles) {
       const fullPath = `${documentDir}${tempFile}`;
-      const info = await FileSystem.getInfoAsync(fullPath);
+      const info = await getInfoAsync(fullPath);
       
       if (info.exists) {
         if (info.isDirectory) {
@@ -330,7 +336,7 @@ export const createZipFile = async (
     
     for (let i = 0; i < imagePaths.length; i++) {
       const imagePath = imagePaths[i];
-      const fileInfo = await FileSystem.getInfoAsync(imagePath);
+      const fileInfo = await getInfoAsync(imagePath);
       
       if (fileInfo.exists) {
         // Extract file extension
@@ -355,7 +361,7 @@ export const createZipFile = async (
     const zipPath = `${documentDir}${zipName}.zip`;
     
     // Remove existing zip file if it exists
-    const zipInfo = await FileSystem.getInfoAsync(zipPath);
+    const zipInfo = await getInfoAsync(zipPath);
     if (zipInfo.exists) {
       await FileSystem.deleteAsync(zipPath);
     }

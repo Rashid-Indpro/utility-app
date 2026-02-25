@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import * as ImageManipulator from 'expo-image-manipulator';
-import * as FileSystem from 'expo-file-system';
+import { getInfoAsync } from 'expo-file-system/legacy';
 import * as MediaLibrary from 'expo-media-library';
 
 interface ImageData {
@@ -86,7 +86,16 @@ export const ImageProcessingProvider: React.FC<{ children: React.ReactNode }> = 
   
   const getImageInfo = useCallback(async (uri: string): Promise<ImageData> => {
     try {
-      const info = await FileSystem.getInfoAsync(uri);
+      let size: number | undefined;
+      try {
+        const info = await getInfoAsync(uri);
+        if (info.exists && 'size' in info) {
+          size = info.size;
+        }
+      } catch (e) {
+        console.warn('Could not get file size:', e);
+      }
+      
       const { width, height } = await ImageManipulator.manipulateAsync(uri, [], { 
         format: ImageManipulator.SaveFormat.JPEG 
       });
@@ -95,7 +104,7 @@ export const ImageProcessingProvider: React.FC<{ children: React.ReactNode }> = 
         uri,
         width,
         height,
-        size: info.exists ? info.size : undefined,
+        size,
         name: uri.split('/').pop(),
       };
     } catch (error) {
@@ -170,14 +179,12 @@ export const ImageProcessingProvider: React.FC<{ children: React.ReactNode }> = 
     const savedPaths: string[] = [];
     
     try {
-      // Request permissions
-      const { status } = await MediaLibrary.requestPermissionsAsync();
-      if (status !== 'granted') {
-        throw new Error('Media library permissions not granted');
-      }
+      // Note: Don't call MediaLibrary.requestPermissionsAsync() in Expo Go - it causes AUDIO permission errors
+      // The createAssetAsync call below will handle its own permissions
       
       for (const image of images) {
         const fileName = customName || `pixozen_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        // createAssetAsync will request necessary permissions on its own
         const asset = await MediaLibrary.createAssetAsync(image.uri);
         savedPaths.push(asset.uri);
       }
